@@ -5,15 +5,15 @@
     <body>
 
         <!-- jQuery version must be >= 1.8.0; -->
-        <script src="node_modules/jquery/dist/jquery.min.js"></script>
-        <script src="node_modules/lightgallery/dist/js/lightgallery.min.js"></script>
+        <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
+        <script type="text/javascript" src="node_modules/lightgallery/dist/js/lightgallery.min.js"></script>
 
         <!-- A jQuery plugin that adds cross-browser mouse wheel support. (Optional) -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>
 
         <!-- lightgallery plugins -->
-        <script src="node_modules/lightgallery/modules/lg-thumbnail.min.js"></script>
-        <script src="node_modules/lightgallery/modules/lg-fullscreen.min.js"></script>
+        <script type="text/javascript" src="node_modules/lightgallery/modules/lg-thumbnail.min.js"></script>
+        <script type="text/javascript" src="node_modules/lightgallery/modules/lg-fullscreen.min.js"></script>
 
         <?php
 
@@ -34,7 +34,9 @@ foreach ($files as $file) {
 }
 echo $output . '</div>';
 ?>
+
         <script type="text/javascript">
+            console.log(window)
             lightGallery(document.getElementById('animated-thumbnails'), { thumbnail:true });
         </script>
 
