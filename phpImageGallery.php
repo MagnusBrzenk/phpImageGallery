@@ -37,7 +37,8 @@ echo $output . '</div>';
 
         <script type="text/javascript">
             console.log(window)
-            lightGallery(document.getElementById('animated-thumbnails'), { thumbnail:true });
+            // lightGallery(document.getElementById('animated-thumbnails'), { thumbnail:true });
+            $('#animated-thumbnails').lightGallery({ thumbnail:true });
         </script>
 
     </body>
