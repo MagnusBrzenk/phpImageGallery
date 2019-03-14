@@ -28,8 +28,8 @@ $output = '<div id="animated-thumbnails">';
 $dir = './';
 $files = scd($dir);
 foreach ($files as $file) {
-    echo "<!--" . strpos($file, '.jpg') . "  " . $file . "-->";
-    if (strpos($file, '.jpg') === true || strpos($file, '.mov') === true) {
+    echo "<!--" . strpos($file, '.jpg') !== false . "  " . $file . "-->";
+    if (strpos($file, '.jpg') !== false || strpos($file, '.mov') !== false) {
         $output .= '<a href="' . $file . '"><img src="thumbs/' . $file . '" /></a>';
     }
 }
