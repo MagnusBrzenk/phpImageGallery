@@ -6,7 +6,7 @@
 
         <!-- jQuery version must be >= 1.8.0; -->
         <script src="node_modules/jquery/dist/jquery.min.js"></script>
-        <script src="js/lightgallery.min.js"></script>
+        <script src="node_modules/lightgallery/dist/js/lightgallery.min.js"></script>
 
         <!-- A jQuery plugin that adds cross-browser mouse wheel support. (Optional) -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>
