@@ -1,0 +1,9 @@
+# Dirs to be created but not committed
+dot-heic-files
+dot-mov-files
+images
+videos
+image-thumbs
+video-thumbs
+triage
+redundant

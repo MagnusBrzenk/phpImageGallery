@@ -1,5 +1,7 @@
-
-
-images/**
-movies/**
-image-thumbs/**
+temp/**
+vendor/**
+test.png
+demo.php
+.DS_Store
+.redundant
+lightgallery-example
