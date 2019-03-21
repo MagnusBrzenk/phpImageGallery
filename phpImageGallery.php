@@ -237,80 +237,127 @@
 
 <body>
 
-
-
-
-    <!-- jQuery version must be >= 1.8.0; -->
-    <!-- <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script> -->
-    <!-- <script type="text/javascript" src="node_modules/lightgallery/dist/js/lightgallery.min.js"></script> -->
-
-    <!-- A jQuery plugin that adds cross-browser mouse wheel support. (Optional) -->
-    <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script> -->
-
-    <!-- lightgallery plugins -->
-    <!-- <script type="text/javascript" src="node_modules/lightgallery/modules/lg-thumbnail.min.js"></script> -->
-    <!-- <script type="text/javascript" src="node_modules/lightgallery/modules/lg-fullscreen.min.js"></script> -->
-    <!-- <script type="text/javascript" src="node_modules/lightgallery/modules/lg-video.min.js"></script> -->
-
     <?php
 
-    function scd($dir)
+    function scan_media_files()
     {
-        $files = scandir($dir);
+        $image_files = scandir('./images');
+        $video_files = scandir('./videos');
+        $files = array_merge($image_files, $video_files);
         sort($files);
-        reset($files);
+        reset($files); # Resets array pointer
         return $files;
     }
 
     function generateElementsFromMediaFiles()
     {
-        //Video Files Part I
-        $output = "<h1> VIDEOS </h1>";
-        $movie_files = scd('./videos');
+        // Initialize
+        $media_files = scan_media_files();
+        $output = "";
+
+        // First loop just for videos
         $index = 0;
-        foreach ($movie_files as $file) {
-            if (strpos($file, '.m4v') !== false || strpos($file, '.mp4') !== false) {
-                $output .= '
-                    <div style="display:none;" id="video-' . $index . '">
-                        <video class="lg-video-object lg-html5" controls preload="none">
-                            <!--' . ($file) . '-->
-                            <source src="videos/' . $file . '">
-                            Your browser does not support HTML5 video.
-                        </video>
-                    </div>';
+        foreach ($media_files as $file) {
+            if (strpos($file, '.m4v') !== false) {
+                $output .=
+                    '                        
+                        <div
+                            style="display:none;"
+                            id="video' . $index . '"
+                        >
+                            <video
+                                class="lg-video-object lg-html5"
+                                controls
+                                preload="none"
+                            >
+                                <source
+                                    src="videos/' . $file . '"
+                                    type="video/mp4"
+                                >
+                                Your browser does not support HTML5 video.
+                            </video>
+                        </div>                        
+                    ';
             }
             $index++;
         }
-        //Video Files Part II
-        $output .= '<div class="demo-gallery"><ul id="html5-videos">';
+
+        // Second loop for mixed media
+        $output .=
+            '
+                <div class="cont">
+                    <div class="page-head">
+                        <h1>jQuery lightgallery</h1>
+                        <p class="lead">
+                            A lightweight, customizable, modular, responsive, lightbox gallery plugin for jQuery.
+                        </p>
+                        <a
+                            href="https://github.com/sachinchoolur/lightGallery"
+                            class="btn btn-primary btn-lg"
+                        >
+                            View on github
+                        </a>
+                    </div>
+                    <div class="demo-gallery">
+                        <ul id="lightgallery">
+            ';
         $index = 0;
-        foreach ($movie_files as $file) {
-            if (strpos($file, '.m4v') !== false || strpos($file, '.mp4') !== false) {
-                $output .= '
-                            <li data-poster="video-thumbs/' . $file . '.jpg" data-sub-html="video caption' . $index . '" data-html="#video-' . $index . '" >
-                                <img src="video-thumbs/' . $file . '.jpg" />
-                            </li>
-                        ';
+        reset($media_files);
+        foreach ($media_files as $file) {
+            if (strpos($file, '.m4v') !== false) {
+                $output .=
+                    '
+                        <li
+                            class="video"
+                            data-html="#video' . $index . '"
+                            data-poster="video-thumbs/' . $file . '.jpg"
+                        >
+                            <a href>
+                                <img
+                                    class="img-responsive"
+                                    src="video-thumbs/' . $file . '.jpg"
+                                >
+                                <div class="demo-gallery-poster">
+                                    <img src="https://sachinchoolur.github.io/lightGallery/static/img/play-button.png">
+                                </div>
+                            </a>
+                            <h5>HTML5 Video</h5>
+                        </li>                    
+                    ';
             }
+            if (strpos($file, '.jpg') !== false) {
+                $output .=
+                    '
+                        <li
+                            data-src="image-thumbs/' . $file . '"
+                            data-sub-html="<h4>Cool Pic</h4>"
+                            data-pinterest-text="Pin it"
+                            data-tweet-text="share on twitter "
+                        >
+                            <a href>
+                                <img
+                                    class="img-responsive"
+                                    src="image-thumbs/' . $file . '"
+                                >
+                                <div class="demo-gallery-poster">
+                                    <img src="https://sachinchoolur.github.io/lightGallery/static/img/zoom.png">
+                                </div>
+                            </a>
+                            <h5>Responsive image</h5>
+                        </li>                
+                    ';
+            };
             $index++;
         }
-        $output .= '</ul></div>';
-
-        $output .= "<h1> IMAGES </h1>";
-
-        //Image Files
-        if (!false) {
-            $image_files = scd('./images');
-            $output .= '<div id="animated-thumbnails">';
-            $index = 0;
-            foreach ($image_files as $file) {
-                if (strpos($file, '.jpg') !== false) {
-                    $output .= '<a href="images/' . $file . '"><img src="image-thumbs/' . $file . '" /></a>';
-                }
-                $index++;
-            }
-            $output .= '</div>';
-        }
+        $output .=
+            '
+                        </ul>
+                        <span class="small">
+                            Click on any of the images to see lightGallery
+                        </span>
+                    </div>
+                </div>
+            ';
 
         echo $output;
     }
