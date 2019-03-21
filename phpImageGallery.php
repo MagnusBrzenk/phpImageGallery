@@ -264,24 +264,8 @@
 
     function generateElementsFromMediaFiles()
     {
-        $output = "<h1> IMAGES </h1>";
-
-        //Image Files
-        if (!false) {
-            $image_files = scd('./images');
-            $output .= '<div id="animated-thumbnails">';
-            $index = 0;
-            foreach ($image_files as $file) {
-                if (strpos($file, '.jpg') !== false) {
-                    $output .= '<a href="images/' . $file . '"><img src="image-thumbs/' . $file . '" /></a>';
-                }
-                $index++;
-            }
-            $output .= '</div>';
-        }
-
         //Video Files Part I
-        $output .= "<h1> VIDEOS </h1>";
+        $output = "<h1> VIDEOS </h1>";
         $movie_files = scd('./videos');
         $index = 0;
         foreach ($movie_files as $file) {
@@ -303,14 +287,31 @@
         foreach ($movie_files as $file) {
             if (strpos($file, '.m4v') !== false || strpos($file, '.mp4') !== false) {
                 $output .= '
-                    <li data-poster="video-thumbs/' . $file . '.jpg" data-sub-html="video caption' . $index . '" data-html="#video-' . $index . '" >
-                        <img src="video-thumbs/' . $file . '.jpg" />
-                    </li>
-                ';
+                            <li data-poster="video-thumbs/' . $file . '.jpg" data-sub-html="video caption' . $index . '" data-html="#video-' . $index . '" >
+                                <img src="video-thumbs/' . $file . '.jpg" />
+                            </li>
+                        ';
             }
             $index++;
         }
         $output .= '</ul></div>';
+
+        $output = "<h1> IMAGES </h1>";
+
+        //Image Files
+        if (!false) {
+            $image_files = scd('./images');
+            $output .= '<div id="animated-thumbnails">';
+            $index = 0;
+            foreach ($image_files as $file) {
+                if (strpos($file, '.jpg') !== false) {
+                    $output .= '<a href="images/' . $file . '"><img src="image-thumbs/' . $file . '" /></a>';
+                }
+                $index++;
+            }
+            $output .= '</div>';
+        }
+
         echo $output;
     }
 
