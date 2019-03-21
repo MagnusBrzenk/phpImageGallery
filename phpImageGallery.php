@@ -296,7 +296,7 @@
         }
         $output .= '</ul></div>';
 
-        $output = "<h1> IMAGES </h1>";
+        $output .= "<h1> IMAGES </h1>";
 
         //Image Files
         if (!false) {
