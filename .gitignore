@@ -5,3 +5,4 @@ demo.php
 .DS_Store
 .redundant
 lightgallery-example
+.env

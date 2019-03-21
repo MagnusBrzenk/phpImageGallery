@@ -12,7 +12,7 @@ if [[ $1 != "--quiet" ]] && [[ ! -z $1 ]]; then
 fi
 
 # Get array of dirs to-be-created from .gitignore-dirs
-declare -a dirsToBeCreated=($(cat .gitignore-dirs))
+IFS=$'\n' dirsToBeCreated=($(cat .gitignore-dirs))
 
 if [[ $1 != "--quiet" ]]; then
     echo "\n==================="
@@ -21,11 +21,13 @@ fi
 
 ## Loop through array and create dir if it doesnt already exist
 for dir in "${dirsToBeCreated[@]}"; do
-    if [ -d $dir ]; then
+    if [[ $dir =~ ^#.* ]]; then
+        echo "Ignore Line: "$dir
+    elif [ -d $dir ]; then
         [[ $1 != "--quiet" ]] && echo "Dir already exists: "$dir
     else
         [[ $1 != "--quiet" ]] && echo "Creating dir: "$dir
-        # mkdir $dir
+        mkdir $dir
     fi
 done
 
