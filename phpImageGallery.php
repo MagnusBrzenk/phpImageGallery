@@ -94,20 +94,24 @@
 
         .demo-gallery>ul {
             margin-bottom: 0;
-            padding-left: 15px;
+            padding-left: 5px;
         }
 
         .demo-gallery>ul>li {
-            margin-bottom: 15px;
-            /* width: 180px; */
+            margin-bottom: 5px;
+            /* width & height need to be same dimensions as thumbnails! */
+            /* width: 150px;
+            height: 150px; */
+            height: 10vw;
+            width: 10vw;
             display: inline-block;
-            margin-right: 15px;
-            list-style: outside none none;
+            margin-right: 5px;
+            /* list-style: outside none none; */
         }
 
         .demo-gallery>ul>li a {
-            border: 3px solid #FFF;
-            border-radius: 3px;
+            border: 1px solid #FFF;
+            border-radius: 0px;
             display: block;
             overflow: hidden;
             position: relative;
@@ -121,8 +125,8 @@
             transition: transform 0.15s ease 0s;
             -webkit-transform: scale3d(1, 1, 1);
             transform: scale3d(1, 1, 1);
-            height: 100%;
-            width: 100%;
+            height: 10vw;
+            width: 10vw;
         }
 
         .demo-gallery>ul>li a:hover>img {
@@ -252,13 +256,14 @@
     function generateElementsFromMediaFiles()
     {
         // Initialize
+        $max_items = 9999999;
         $media_files = scan_media_files();
         $output = "";
 
         // First loop just for videos
         $index = 0;
         foreach ($media_files as $file) {
-            if (strpos($file, '.m4v') !== false) {
+            if (strpos($file, '.m4v') !== false && $index <= $max_items) {
                 $output .=
                     '                        
                         <div
@@ -287,16 +292,10 @@
             '
                 <div class="cont">
                     <div class="page-head">
-                        <h1>jQuery lightgallery</h1>
+                        <h1>Adventures of Rach, Dan & Jessington</h1>
                         <p class="lead">
-                            A lightweight, customizable, modular, responsive, lightbox gallery plugin for jQuery.
+                            Pics and videos of the family
                         </p>
-                        <a
-                            href="https://github.com/sachinchoolur/lightGallery"
-                            class="btn btn-primary btn-lg"
-                        >
-                            View on github
-                        </a>
                     </div>
                     <div class="demo-gallery">
                         <ul id="lightgallery">
@@ -304,7 +303,7 @@
         $index = 0;
         reset($media_files);
         foreach ($media_files as $file) {
-            if (strpos($file, '.m4v') !== false) {
+            if (strpos($file, '.m4v') !== false && $index <= $max_items) {
                 $output .=
                     '
                         <li
@@ -321,15 +320,14 @@
                                     <img src="https://sachinchoolur.github.io/lightGallery/static/img/play-button.png">
                                 </div>
                             </a>
-                            <h5>HTML5 Video</h5>
                         </li>                    
                     ';
             }
-            if (strpos($file, '.jpg') !== false) {
+            if (strpos($file, '.jpg') !== false && $index <= $max_items) {
                 $output .=
                     '
                         <li
-                            data-src="image-thumbs/' . $file . '"
+                            data-src="images/' . $file . '"
                             data-sub-html="<h4>Cool Pic</h4>"
                             data-pinterest-text="Pin it"
                             data-tweet-text="share on twitter "
@@ -343,7 +341,6 @@
                                     <img src="https://sachinchoolur.github.io/lightGallery/static/img/zoom.png">
                                 </div>
                             </a>
-                            <h5>Responsive image</h5>
                         </li>                
                     ';
             };
@@ -366,13 +363,10 @@
     ?>
 
     <script type="text/javascript">
-        console.log(window)
-        $('#animated-thumbnails').lightGallery({
-            thumbnail: true
+        $(document).ready(function() {
+            $('#lightgallery').lightGallery();
         });
-        $('#html5-videos').lightGallery();
     </script>
-
 </body>
 
 </html> 
