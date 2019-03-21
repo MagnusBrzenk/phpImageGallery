@@ -273,7 +273,7 @@
             $index = 0;
             foreach ($image_files as $file) {
                 if (strpos($file, '.jpg') !== false) {
-                    $output .= '<a href="images/' . $file . '"><img src="image-thumbs/' . str_replace('.jpg', '-thumb.jpg', $file) . '" /></a>';
+                    $output .= '<a href="images/' . $file . '"><img src="image-thumbs/' . $file . '" /></a>';
                 }
                 $index++;
             }
