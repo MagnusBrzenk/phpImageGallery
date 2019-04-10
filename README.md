@@ -8,7 +8,7 @@ If you are working with a raspberry pi for your remote server, then I recommend 
 
 ### Basic Approach
 
-Clone this repo to your mac and run `sh _create_dirs.sh`. This will create several dirs, including one called `triage`. Now, get your photos/videos from your iPhone into `triage`, and run `sh _pipeline.sh`. This will move files from triage to different dirs, create thumbnails, resize files, etc.
+ Clone this repo to your mac and run `sh _create_dirs.sh`. This will create several dirs, including one called `triage`. Now, get your photos/videos from your iPhone into `triage`, and run `sh _pipeline.sh`. This will move files from triage to different dirs, create thumbnails, resize files, etc.
 
 If you now serve the main script (which will eventually be `index.php`) from a local php-enabled apache server on your mac, then you can expect to see the gallery of your images and videos. I recommend you use the homebrew installations of `apache2` and `php7`.
 
