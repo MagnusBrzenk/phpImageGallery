@@ -46,11 +46,20 @@ raise_error() {
 }
 
 main() {
-    mode="VERBOSE"
-    if $IS_QUIET_MODE; then
-        mode="QUIET"
+
+    ### Make sure a dir called "galleries" exists
+    if [[ ! -d galleries ]]; then
+        echo "Creating dir called 'galleries'"
+        mkdir galleries
     fi
-    # echo "Let's create a gallery called "$GALLERY_NAME" in "$mode" mode!"
+
+    ### Cancel if dir of $GALLERY_NAME already exists
+    if [[ -d "./galleries/"$GALLERY_NAME ]]; then
+        echo "Directory already exists called '"$GALLERY_NAME"'!!!"
+        exit 1
+    fi
+
+    ### Confirm name of gallery to be created:
     echo
     echo "Are you sure you want to create a new gallery called '"$GALLERY_NAME"'? (Y/n)"
     echo
@@ -62,8 +71,21 @@ main() {
         echo "============================"
         exit 0
     fi
+    echo "Creating '"$GALLERY_NAME"' ..."
 
-    echo "Creating "$GALLERY_NAME
+    ### Create dir structure for new gallery
+    mkdir "./galleries/"$GALLERY_NAME
+    mkdir "./galleries/"$GALLERY_NAME"/triage"
+    mkdir "./galleries/"$GALLERY_NAME"/images"
+    mkdir "./galleries/"$GALLERY_NAME"/image-thumbs"
+    mkdir "./galleries/"$GALLERY_NAME"/videos"
+    mkdir "./galleries/"$GALLERY_NAME"/video-thumbs"
+    mkdir "./galleries/"$GALLERY_NAME"/processed-media"
+
+    ### Finalize
+    echo " ... done!"
+    echo "Now export any pics/movies you want from Photos App into "$GALLERY_NAME"/triage"
+    echo "and then run \`sh _process_media.sh\`"
 }
 
 #############################
