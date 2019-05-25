@@ -17,11 +17,12 @@ source _gen_resized_image.sh
 cd galleries
 for gallery in *; do
 
+    # Enter gallery and begin processing it
+    cd $gallery
+    echo
     echo "- - - - - - - - - - - - - - - - - - "
     echo "Processing the '"$gallery"' gallery"
     echo "- - - - - - - - - - - - - - - - - - "
-
-    cd $gallery
 
     # Confirm gallery has required dirs
     if [[ ! -d image-thumbs || ! -d images || ! -d processed-media || ! -d triage || ! -d videos || ! -d video-thumbs ]]; then
@@ -29,7 +30,7 @@ for gallery in *; do
         exit 1
     fi
 
-    # Loop thru files in /triage and process based on file type
+    # Enter /triage and process files based on type
     cd triage
     for file in *; do
 
@@ -38,14 +39,14 @@ for gallery in *; do
         mv $file $file_lowercase
 
         # If file has already been processed, then dont re-process
-        if false && [[ -f ../processed-media/$file_lowercase ]]; then
+        if [[ -f ../processed-media/$file_lowercase ]]; then
 
             echo "File "$file" has already been processed; see: "$gallery/processed-media/$file_lowercase
-            sleep 1
+            sleep .1
         else
 
             echo "Processing "$file
-            sleep 2
+            sleep .2
 
             # Copy original; note:
             cp $file_lowercase ../processed-media/
@@ -53,7 +54,7 @@ for gallery in *; do
             # Handle new image
             if [[ $file_lowercase =~ .*\.(jpg|jpeg|heic) ]]; then
 
-                echo $file_lowercase" is a permitted image!!!"
+                echo "\n"$file_lowercase" is a permitted image!!!"
                 # Call function to generate resized image called `resized-$file_lowercase`
                 gen_resized_image $file_lowercase $target_image_size_kbs
                 mv resized-$file_lowercase ../images/$file_lowercase
@@ -63,10 +64,10 @@ for gallery in *; do
             # Handle new movie
             elif [[ $file_lowercase =~ .*\.(mp4|m4v|mov) ]]; then
 
-                echo $file_lowercase" is a permitted movie!!!"
+                echo "\n" $file_lowercase" is a permitted movie!!!"
                 # Gen new m4v video
                 new_video_file=${file_lowercase%.*}.m4v
-                ffmpeg -loglevel error -i $file_lowercase -vcodec libx264 -crf 23 ../videos/$new_video_file
+                ffmpeg -y -loglevel error -i $file_lowercase -vcodec libx264 -crf 23 ../videos/$new_video_file
                 # Gen thumbnail from 1st frame
                 video_thumb=$new_video_file".jpg"
                 convert -define jpeg:size=200x200 $file_lowercase[1] -thumbnail 50x50^ -gravity center -extent 50x50 ../video-thumbs/$video_thumb
@@ -76,5 +77,10 @@ for gallery in *; do
                 echo $file" has no place here :("
             fi
         fi
-    done
-done
+
+    done #End of files-in-triage loop
+
+    # Go back to galleries
+    cd ../..
+
+done #End of galleries loop

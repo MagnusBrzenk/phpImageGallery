@@ -265,7 +265,7 @@
         foreach ($media_files as $file) {
             if (strpos($file, '.m4v') !== false && $index <= $max_items) {
                 $output .=
-                    '                        
+                    '
                         <div
                             style="display:none;"
                             id="video' . $index . '"
@@ -281,7 +281,7 @@
                                 >
                                 Your browser does not support HTML5 video.
                             </video>
-                        </div>                        
+                        </div>
                     ';
             }
             $index++;
@@ -292,7 +292,7 @@
             '
                 <div class="cont">
                     <div class="page-head">
-                        <h1>Adventures of Rach, Dan & Jessington</h1>
+                        <h1>' . str_replace('_', ' ', basename(__DIR__)) . '</h1>
                         <p class="lead">
                             Pics and videos of the family
                         </p>
@@ -320,7 +320,7 @@
                                     <img src="https://sachinchoolur.github.io/lightGallery/static/img/play-button.png">
                                 </div>
                             </a>
-                        </li>                    
+                        </li>
                     ';
             }
             if (strpos($file, '.jpg') !== false && $index <= $max_items) {
@@ -341,7 +341,7 @@
                                     <img src="https://sachinchoolur.github.io/lightGallery/static/img/zoom.png">
                                 </div>
                             </a>
-                        </li>                
+                        </li>
                     ';
             };
             $index++;
@@ -369,4 +369,4 @@
     </script>
 </body>
 
-</html> 
+</html>

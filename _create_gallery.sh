@@ -38,6 +38,9 @@ display_usage() {
     echo "-h, --help   Display usage instructions"
     echo "-q, --quiet  Run in quiet mode"
     echo
+    echo "If you want spaces in your name, then enclose with quotation marks"
+    echo "E.g. \"Adam and Eve\""
+    echo
 }
 
 raise_error() {
@@ -73,6 +76,9 @@ main() {
     fi
     echo "Creating '"$GALLERY_NAME"' ..."
 
+    # Replace spaces with '_' using bash parameter expansion:
+    GALLERY_NAME=${GALLERY_NAME//[[:space:]]/'_'}
+
     ### Create dir structure for new gallery
     mkdir "./galleries/"$GALLERY_NAME
     mkdir "./galleries/"$GALLERY_NAME"/triage"
@@ -81,6 +87,9 @@ main() {
     mkdir "./galleries/"$GALLERY_NAME"/videos"
     mkdir "./galleries/"$GALLERY_NAME"/video-thumbs"
     mkdir "./galleries/"$GALLERY_NAME"/processed-media"
+
+    ### Copy php script for viewing new gallery
+    cp phpImageGallery.php "./galleries/"$GALLERY_NAME"/index.php"
 
     ### Finalize
     echo " ... done!"
