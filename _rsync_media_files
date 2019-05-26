@@ -1,0 +1,11 @@
+#!/bin/bash
+
+#Load .env vars
+eval $(cat .env | sed 's/^/export /')
+
+# Sync galleries with remote dir
+rsync -avzd \
+    --exclude=**/media-dump \
+    --exclude=**/processed-media \
+    $PWD/galleries/ \
+    $REMOTE_USER@$REMOTE_URL:$REMOTE_GALLERIES_FILE_LOCATION

@@ -1,0 +1,76 @@
+#!/bin/bash
+
+clear
+echo """
+================
+PROCESSING MEDIA
+================
+"""
+
+# Params
+target_image_size_kbs=100
+thumb_size=100
+
+# Import media-resizing functions
+source _gen_resized_image.sh
+source _gen_resized_video.sh
+
+# Loop through contents of media-dump dir
+cd galleries
+for gallery in *; do
+
+    # Enter gallery and begin processing it
+    cd $gallery
+    echo
+    echo "- - - - - - - - - - - - - - - - - - "
+    echo "Processing the '"$gallery"' gallery"
+    echo "- - - - - - - - - - - - - - - - - - "
+
+    # Confirm gallery has required dirs
+    if [[ ! -d image-thumbs || ! -d images || ! -d processed-media || ! -d media-dump || ! -d videos || ! -d video-thumbs ]]; then
+        echo "Error! "$gallery" does not have all required dirs!" 1>&2
+        exit 1
+    fi
+
+    # Enter /media-dump and process files based on type
+    cd media-dump
+    for file in *; do
+
+        # Rename file to lowercase for ease/consistent processing
+        file_lowercase=$(echo $file | tr [A-Z] [a-z])
+        mv $file $file_lowercase
+
+        # Begin processing file
+        echo "\n>>>> "$file""
+        sleep .2
+
+        # Copy original
+        cp $file_lowercase ../processed-media/
+
+        # Handle new image
+        if [[ $file_lowercase =~ .*\.(jpg|jpeg|heic) ]]; then
+            # Call function to generate resized image called `resized-$file_lowercase`
+            gen_resized_image $file_lowercase $target_image_size_kbs
+            mv resized-$file_lowercase ../images/$file_lowercase
+            convert -define jpeg:size=400x400 $file_lowercase[1] -thumbnail ${thumb_size}x${thumb_size}^ -gravity center -extent ${thumb_size}x${thumb_size} ../image-thumbs/$file_lowercase
+            rm $file_lowercase
+
+        # Handle new movie
+        elif [[ $file_lowercase =~ .*\.(mp4|m4v|mov) ]]; then
+            new_video_file=${file_lowercase%.*}.m4v
+            gen_resized_video $file_lowercase $new_video_file # Generate resized video in ../videos
+            video_thumb=$new_video_file".jpg"
+            convert -define jpeg:size=200x200 $file_lowercase[1] -thumbnail ${thumb_size}x${thumb_size}^ -gravity center -extent ${thumb_size}x${thumb_size} ../video-thumbs/$video_thumb
+            rm $file_lowercase
+
+        # Reject unrecognized file extensions
+        else
+            echo $file" has incompatible extension. Skipping!"
+        fi
+
+    done #End of files-in-media-dump loop
+
+    # Go back to galleries
+    cd ../..
+
+done #End of galleries loop

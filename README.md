@@ -1,31 +1,54 @@
 # iOS-Apache Image & Video Gallery
 
-This code enables you to get your iPhone images and videos into an image gallery hosted on a php-enabled apache file server. The instructions below assume that you are working with an iPhone and Apple OS.
+## Overview
 
-If you are working with a raspberry pi for your remote server, then I recommend you run all of the file-format conversion scripts on your local machine since it's not good for your SD card to do so much heavy writing to disk. This repo has a script that rsyncs the final image and video dirs.
+This repo is designed for Mac OSX users who have photos/movies in their PHOTOS app that they wish to publish to a viewing gallery on their own server. This repo is especially designed with a raspberry pi running apache in mind (though it could be easily adapted to any remote \*nix server using some other file server).
 
-## Image and Video Formatting
+The basic idea is that you go through the photo/videos in your PHOTOS app on your Mac and export whatever you want to a local 'gallery' directory (see details below for setting that up). These files that you output are typically very large (because modern iPhones are high res), and overkill for sharing media with friends or family. So once you've exported the content you want from PHOTOS app to your gallery, you run a script that goes through your images and videos and reduces them to a uniform size and format. Finally, you run a simple script that uses rsync to move your resized media and some gallery-viewing code over to a desitination you specify on your remote server. They can then be viewed from anywhere with nice slideshows in separate galleries.
 
-### Basic Approach
+See demo: forthcoming
 
- Clone this repo to your mac and run `sh _create_dirs.sh`. This will create several dirs, including one called `triage`. Now, get your photos/videos from your iPhone into `triage`, and run `sh _pipeline.sh`. This will move files from triage to different dirs, create thumbnails, resize files, etc.
+## Usage
 
-If you now serve the main script (which will eventually be `index.php`) from a local php-enabled apache server on your mac, then you can expect to see the gallery of your images and videos. I recommend you use the homebrew installations of `apache2` and `php7`.
+### Remote Server
 
-Once it is working locally, you need to create a mirror of the gallery on your remote server.
+This repo has been tested on raspberry pi with stretch lite (2019). You need a standard install of apache and php. You need to designate a directory to be synced with the `galleries` directory to be created in your copy of this repo on your Mac.
 
-### Generating Local JPEGs
+If you want to avoid complications with write permissions, then the easiest way is to symlink such a directory from your standard apache document root to a directory in e.g. your home directory. For example, create a directory `/home/pi/galleries` and then link to it with the command `sudo ln -fs /home/pi/galleries /var/www/html/galleries`.
 
-The goal is to get your images into JPEG format in dirs `images` and `image-thumbs`. If your images are already in your [Apple Photos App](https://www.apple.com/macos/photos/) on your Apple Computer, then you can select the ones you want to deploy to your apache file server in the Photos App and export them to your local version of this code repo in the dir `images`.
+### On Your Mac
 
-If you transfer the photos directly from your iPhone to your Apple Computer using e.g. Air Drop, then those photos will be in the High Efficiency Image Format (HEIF), whose extension is normally `.HEIC` (for some reason). In that case, move the `heic` files to the dir `dot-heic-files` and run the script `_convert_heic_to_jpeg.sh`, so that jpeg copies get created in the images dir.
+#### Overview
 
-### Generating Local MP4s
+This repo is designed to require very little configuration. The idea is that the heavy computing (viz. resizing images and movies) is done on your (relatively powerful) Mac, and you only transfer reduced-in-size media file over to (and serve from) your server (which, in the case of a raspberry pi, is much less powerful).
 
-Likewise, with videos, if you export a film directly from Apple Photos to the videos dir, then it will be in the format `mv4` (which is supposed to be the same - for all intents and purposes - as mp4).
+#### Requirements
 
-If you export directly from the iPhone via e.g. Air Drop, then the file will be in the format `.mov`. In that case, save the file to `dot-mov-files` and run `_convert_mov_to_mp4.sh`.
+Make sure you have `convert` and `ffmpeg` installed and on your `$PATH`. This is super easy with [homebrew](), just install these binaries using `brew install imagemagick` and `brew install ffmpeg` respectively. This repo's scripts have been successfully tested with `ImageMagick v7.0.8-33` and `ffmpeg v4.1.1`
 
-### Triage Dir
+#### Operating Instructions
 
-To avoid having to manually sort out different file types, you can dump any file (`jpg, mov, mp4, mv4, heic, etc.`) into the `triage` dir and run `_sort_triage.sh`, which will simply move the file to its respective destination (e.g. `mov -> dot-mov-files`).
+1. Clone and enter the repo: `git clone https://github.com/MagnusBrzenk/phpImageGallery.git YYY; cd YYY`
+2. `cp .env-template .env` and fill in the environment variables in `.env` with the details for your remote server.
+3. Run `./_create_gallery "GALLERY NAME"` to create a new gallery.
+   - Note: The first time you run this, it will create a dir called `galleries`, which is basically what will get synced with your remote server as specified by the env variable `REMOTE_GALLERIES_FILE_LOCATION`.
+   - Note: You can create multiple galleries that will be accesible by a url of the given name
+   - Note: be sure to use "quotation marks" if your gallery name has spaces
+4. Start exporting photos/movies from your Mac's PHOTOS app to the directory `galleries/[GALLERY NAME]/media-dump/`.
+   - Note: This can be done easily by browsing through your media and then using the short cut "SHIFT+CMD+E" to export it. The first time you do this, you'll have to select the right output directory for the gallery you want to 'dump' to, and then after that you can simply press 'Enter' twice to make the process somewhat fast/easy
+   - Note: Make sure when you export your media that you have `Subfolder Format` selected as `None`
+5. Whenever you want to process the media files exported to `media-dump`, just run `./_process_media`.
+   - Note: this script will iterate through all galleries to look for new media files dumped into their respective `media-dump` directory
+   - Note: the files placed in `media-dump` will get moved to `processed-media` in the same gallery.
+6. When you're ready to transfer your processed media, run `_rsync_media_files`.
+   - Note: this will only
+
+## Dev Notes
+
+- The interface for this repo is based primarily off of [this codepen](https://codepen.io/sachinchoolur/pen/jGQYXZ)
+
+- Final step for this repo will be to work out a system for updating captions; probably will use a mysql php wrapper.
+
+## Acknowledgements
+
+The interface for these galleries is a php wrapper around [lightGallery](https://github.com/sachinchoolur/lightGallery) code. Thank you to all of its contributors!
