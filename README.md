@@ -42,6 +42,11 @@ Make sure you have `convert` and `ffmpeg` installed and on your `$PATH`. This is
    - Note: the files placed in `media-dump` will get moved to `processed-media` in the same gallery.
 6. When you're ready to transfer your processed media, run `_rsync_media_files`.
    - Note: this will only
+7. When you sync your media, it will, by default, add files `.htaccess` and `.htpasswd`.
+   - If you're not suing apache then, of course, these won't do anything.
+   - The default location is a `galleries` dir in (or linked to) your standard apache document root folder `/var/www/html/galleries`. If you change your remote directory location in the `.env` file, then you'll have to adjust the `.htaccess` file accordingly.
+   - The default username and password are `guest` and `password`.
+   - To change these, run the command `htpasswd -n NEW_USERNAME` in your Mac terminal. It will prompt you twice for a password to go along with your chosen `NEW_USERNAME` and output a single line fo the form `NEW_USERNAME:xxx`. Copy and paste this into `.htpasswd` in place of what's there. You can do this multiple times if you want to create multiple user-password combinations.
 
 ## Dev Notes
 
