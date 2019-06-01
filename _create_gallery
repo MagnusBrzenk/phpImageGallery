@@ -50,12 +50,10 @@ raise_error() {
 
 main() {
 
-    ### Make sure a dir called "galleries" exists
+    ### Make sure a dir called "galleries" exists and contains essential scripts
     if [[ ! -d galleries ]]; then
         echo "Creating dir called 'galleries'"
         mkdir galleries
-        cp .htaccess ./galleries/
-        cp .htpasswd ./galleries/
     fi
 
     ### Cancel if dir of $GALLERY_NAME already exists
@@ -89,9 +87,29 @@ main() {
     mkdir "./galleries/"$GALLERY_NAME"/videos"
     mkdir "./galleries/"$GALLERY_NAME"/video-thumbs"
     mkdir "./galleries/"$GALLERY_NAME"/processed-media"
+    mkdir "./galleries/"$GALLERY_NAME"/cover-image"
 
-    ### Copy php script for viewing new gallery
-    cp phpImageGallery.php "./galleries/"$GALLERY_NAME"/index.php"
+    # Populate galleries with scripts
+    bash _populate_galleries
+
+    ### Download cover image:
+    echo
+    echo "Do you want to download a cover image? (Y/n)"
+    echo
+    read confirmCoverImage
+
+    if [[ ! $confirmCoverImage =~ n|N|no|No|NO ]]; then
+        echo
+        echo "Enter URL"
+        echo
+        read coverImage
+        # Pretend image is always jpg
+        imageFile=galleries/$GALLERY_NAME/cover-image/image.jpg
+        curl $coverImage -o $imageFile
+        # Convert image to jpg
+        convert -define jpeg:size=400x400 -thumbnail 400x400^ -gravity center -extent 400x400 $imageFile $imageFile
+    fi
+    echo "Creating '"$GALLERY_NAME"' ..."
 
     ### Finalize
     echo " ... done!"

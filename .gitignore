@@ -7,3 +7,6 @@ demo.php
 lightgallery-example
 .env
 galleries
+.step*
+_test_api.sh
+node_modules

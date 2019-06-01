@@ -1,0 +1,66 @@
+#! /bin/bash
+# ======================================================
+# Script to set up mysql DB for the simple captions API
+# ======================================================
+
+# Double check drop-database argument
+if [[ $1 == 1 ]]; then
+    clear
+    echo """
+        Are you sure you want to drop the database before proceeding? (N/y)
+    """
+    read choice
+    if [[ ! $choice =~ y|Y|yes|Yes|YEs|YES ]]; then
+        echo "OK, exiting script."
+        exit 1
+    fi
+fi
+
+# Load .env vars
+eval $(cat .env | sed 's/^/export /')
+
+clear
+echo "
+======================================
+SETTING UP MYSQL DB: '"$LOCAL_DB_NAME"'
+======================================
+"
+
+# Define function to pass variables with SQL queries to our DB
+step=0
+query_mysql() {
+    step=$(($step + 1))
+    local QUERY=$@
+    echo "STEP"$step": "$QUERY
+    echo $(mysql -u $LOCAL_DB_USERNAME -p${LOCAL_DB_PASSWORD} -h "127.0.0.1" --port=3306 -e "$QUERY" 2>.step${step}.log)
+}
+
+### 1. Drop existing DB
+QUERY_DROP_DB="DROP DATABASE $LOCAL_DB_NAME;"
+if [[ $1 == 1 ]]; then query_mysql $QUERY_DROP_DB; fi
+
+### 2. Create DB if it doesn't exist
+QUERY_CREATE_DB="CREATE DATABASE IF NOT EXISTS $LOCAL_DB_NAME;"
+query_mysql $QUERY_CREATE_DB
+
+### 3. Create Table schema
+QUERY_CREATE_TABLES="
+    USE $LOCAL_DB_NAME;
+    CREATE TABLE IF NOT EXISTS Captions (
+    caption_id varchar(12) NOT NULL UNIQUE PRIMARY KEY,
+    caption varchar(350) NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+"
+query_mysql $QUERY_CREATE_TABLES
+
+# Show (normally just pesky) warnings in case there are also errors
+show_warnings_and_errors() {
+    echo
+    echo "--------WARNINGS / ERRORS--------"
+    for i in .step*.log; do
+        echo "File "$i
+        echo $(cat $i)
+        echo "- - - - - - - - - - - - - - - - - - "
+    done
+}
+show_warnings_and_errors
