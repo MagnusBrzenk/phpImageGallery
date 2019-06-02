@@ -45,7 +45,11 @@ function get_captions($caption_id)
     $response = array();
     $result = mysqli_query($connection, $query);
     while ($row = mysqli_fetch_array($result)) {
-        $response[] = array('caption_id' => $row['caption_id'], 'caption' => $row['caption']);
+        $response[] = array(
+            'caption_id' => $row['caption_id'],
+            'caption_text' => $row['caption_text'],
+            'caption_date' => $row['caption_date']
+        );
     }
     header('Content-Type: application/json');
     echo json_encode($response);
@@ -58,10 +62,11 @@ function insert_caption()
     $response = array();
     foreach ($POST_BODY as $DATA) {
         $caption_id = $DATA['caption_id'];
-        $caption = $DATA['caption'];
-        $query = "INSERT INTO captions (caption_id, caption)
-        VALUES('{$caption_id}', '{$caption}') ON DUPLICATE KEY
-        UPDATE caption_id='{$caption_id}', caption='{$caption}'; ";
+        $caption_text = $DATA['caption_text'];
+        $caption_date = array_key_exists('caption_date', $DATA) ? $DATA['caption_date'] : 'NULL';
+        $query = "INSERT INTO captions (caption_id, caption_text, caption_date)
+        VALUES('{$caption_id}', '{$caption_text}', '{$caption_date}') ON DUPLICATE KEY
+        UPDATE caption_id='{$caption_id}', caption_text='{$caption_text}', caption_date='{$caption_date}'; ";
 
         if (mysqli_query($connection, $query)) {
             $response[] = array(
@@ -74,8 +79,6 @@ function insert_caption()
                 'status_message' => 'caption Addition Failed.'
             );
         }
-
-        $temp = $response;
     }
     header('Content-Type: application/json');
     echo json_encode($response);
@@ -86,27 +89,46 @@ function update_caption($caption_id)
     global $connection;
     parse_str(file_get_contents("php://input"), $post_vars);
     $PUT_BODY = json_decode(file_get_contents("php://input"), true);
-    $caption  = $PUT_BODY["caption"];
-    $query = "UPDATE captions SET caption='{$caption}' WHERE caption_id='" . $caption_id . "';";
-    if (mysqli_query($connection, $query)) {
-        $response = array(
-            'status' => 1,
-            'status_message' => 'caption Updated Successfully.'
-        );
+
+    $caption_text = array_key_exists('caption_text', $PUT_BODY) ? $PUT_BODY["caption_text"] : null;
+    $caption_date = array_key_exists('caption_date', $PUT_BODY) ? $PUT_BODY["caption_date"] : null;
+
+    if (!!$caption_text || $caption_date) {
+        $query = "UPDATE captions SET ";
+        if (!!$caption_text) {
+            $query = $query . " caption_text='{$caption_text}' ";
+        }
+        if (!!$caption_text && !!$caption_date) {
+            $query = $query . ", ";
+        }
+        if (!!$caption_date) {
+            $query = $query . " caption_date='{$caption_date}' ";
+        }
+        $query = $query . " WHERE caption_id='" . $caption_id . "';";
+        if (mysqli_query($connection, $query)) {
+            $response = array(
+                'status' => 1,
+                'status_message' => 'caption Updated Successfully.'
+            );
+        } else {
+            $response = array(
+                'status' => 0,
+                'status_message' => 'caption Updation Failed.'
+            );
+        }
+        header('Content-Type: application/json');
+        echo json_encode($response);
     } else {
-        $response = array(
-            'status' => 0,
-            'status_message' => 'caption Updation Failed.'
-        );
+        header('Content-Type: application/json');
+        echo json_encode(array("messa ge" =>  "Deni ed!"));
     }
-    header('Content-Type: application/json');
-    echo json_encode($response);
 }
 
 function delete_caption($caption_id)
 {
     global $connection;
-    $query = "DELETE FROM captions WHERE caption_id='" . $caption_id . "';";
+    $query =  "DELETE FROM captions WHERE capt i on_id='" . $caption_id
+        . "';";
     if (mysqli_query($connection, $query)) {
         $response = array(
             'status' => 1,

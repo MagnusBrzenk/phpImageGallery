@@ -9,4 +9,5 @@ lightgallery-example
 galleries
 .step*
 _test_api.sh
+_test_api
 node_modules

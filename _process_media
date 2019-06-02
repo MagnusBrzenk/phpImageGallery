@@ -8,22 +8,28 @@ PROCESSING MEDIA
 """
 
 # Params
-target_image_size_kbs=100
+target_image_size_kbs=200
 thumb_size=100
 
+# Load .env vars
+eval $(cat .env | sed 's/^/export /')
+
 # Import media-resizing functions
-source _gen_resized_image.sh
-source _gen_resized_video.sh
+source _aux_functions
 
 # Loop through contents of media-dump dir
 cd galleries
 for gallery in *; do
 
+    # Break-loop conditions
+    [ -d "$gallery" ] || continue
+    [ ! $gallery == "vendor" ] || continue
+
     # Enter gallery and begin processing it
     cd $gallery
     echo
     echo "- - - - - - - - - - - - - - - - - - "
-    echo "Processing the '"$gallery"' gallery"
+    echo "Processing the '"$gallery"' gallery "
     echo "- - - - - - - - - - - - - - - - - - "
 
     # Confirm gallery has required dirs
@@ -34,7 +40,49 @@ for gallery in *; do
 
     # Enter /media-dump and process files based on type
     cd media-dump
+
+    # First media-processing loop
+    # Move files in date-labelled dirs back into media-dump and remove dir
+    for dir in */; do
+
+        # Only handle dirs
+        [ -d "$dir" ] || continue
+
+        # Handle each media file in $dir
+        cd "$dir"
+        for file in *; do
+
+            # Only handle real files
+            [ -f "$file" ] || continue
+
+            # Refine file/date strings
+            file_lowercase=$(echo $file | tr [A-Z] [a-z])
+            caption_date="${dir//\//}" # Replaces forward slash in date name
+
+            # Build and run query to add caption_date to this file's name/caption_id
+            query="USE $LOCAL_DB_NAME;
+                        INSERT INTO captions (caption_id, caption_date)
+                        VALUES('$file_lowercase', '$caption_date') ON DUPLICATE KEY
+                        UPDATE caption_id='$file_lowercase', caption_date='$caption_date';
+                    "
+            query_mysql $query
+
+            # Move file back to media-dump
+            echo ">>>"$file_lowercase
+            find ./ -type f -name "$file" -exec mv {} ../"$file_lowercase" \;
+        done
+
+        # Remove any remaining files in data-labelled dir
+        find ./ -type f -delete
+        cd ..
+        rmdir "$dir"
+    done
+
+    # Second media-processing loop
+    # Loop through files in media-dump, process and sort them
     for file in *; do
+
+        [ -f "$file" ] || continue
 
         # Rename file to lowercase for ease/consistent processing
         file_lowercase=$(echo $file | tr [A-Z] [a-z])
@@ -66,7 +114,16 @@ for gallery in *; do
         # Reject unrecognized file extensions
         else
             echo $file" has incompatible extension. Skipping!"
+            continue
         fi
+
+        # Add file name to db:
+        query="USE $LOCAL_DB_NAME;
+                    INSERT INTO captions (caption_id)
+                    VALUES('$file_lowercase') ON DUPLICATE KEY
+                    UPDATE caption_id='$file_lowercase';
+                "
+        query_mysql $query
 
     done #End of files-in-media-dump loop
 

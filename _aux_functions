@@ -1,0 +1,78 @@
+#!/bin/bash
+
+################################################################
+### Function to query mysql DB
+################################################################
+
+# Load .env vars
+eval $(cat .env | sed 's/^/export /')
+if [[ -f .mysql-query-logs.log ]]; then rm .mysql-query-logs.log; fi
+query_mysql() {
+    step=$(($step + 1))
+    local QUERY=$@
+    # echo "EXECUTING: "$QUERY
+    $(mysql -u $LOCAL_DB_USERNAME -p${LOCAL_DB_PASSWORD} -h "127.0.0.1" --port=3306 -e "$QUERY" 2>>.mysql-query-logs.log)
+}
+
+export -f query_mysql
+
+################################################################
+### Function to generate an image copy of targeted size on disk
+### with name "resized-[filename]"
+################################################################
+
+function gen_resized_image() {
+
+    ### Vet function's arguments
+    file=$1
+    target_size_kb=$2
+
+    if [[ $# -lt 2 ]]; then
+        echo "Need two arguments: file, target (kbs)"
+        return
+    fi
+
+    ### Calc resize percent to reduce file disk size to target kbs
+    file_size_kb=$(du -k "$file" | cut -f1)
+    python_cmd="print(round(pow(${target_size_kb}/${file_size_kb},0.5)*100))"
+    resize_percent=$(python3 -c "${python_cmd}")
+
+    ### Perform resizing
+    newfile="resized-"$file
+    convert $file -resize $resize_percent% $newfile
+    new_file_size_kb=$(du -k "$newfile" | cut -f1)
+    echo "File "$file" has been resized from "$file_size_kb" Kbs to "$new_file_size_kb" ("$resize_percent"% of original)"
+}
+
+export -f gen_resized_image
+
+################################################################
+### Function to generate a video copy with name "[filename].m4v"
+################################################################
+
+function gen_resized_video() {
+
+    ### Vet function's arguments
+    if [[ $# -ne 2 ]]; then
+        echo "Need two arguments: old file name, new file name"
+        return
+    fi
+
+    local old_video_file=$1
+    local new_video_file=../videos/$2
+
+    echo "Processing "$1" "$2
+
+    ### Perform resizing
+    ffmpeg -y -loglevel error -i $old_video_file -vcodec libx264 -crf 23 $new_video_file
+
+    old_file_size_kb=$(du -k "$old_video_file" | cut -f1)
+    new_file_size_kb=$(du -k "$new_video_file" | cut -f1)
+
+    python_cmd="print( round(($new_file_size_kb / $old_file_size_kb )*100) )"
+    resize_percent=$(python3 -c "${python_cmd}")
+
+    echo "File "$old_video_file" has been resized from "$old_file_size_kb" Kbs to "$new_file_size_kb" ("$resize_percent"% of original)"
+}
+
+export -f gen_resized_video
