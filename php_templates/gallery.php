@@ -324,11 +324,36 @@
                     ';
             }
             if (strpos($file, '.jpg') !== false && $index <= $max_items) {
+
+                // Build get-caption URL
+                $get_captions_url = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '../captions/' . $file : null;
+
+                // Get caption from api using php curl protocol
+                if (!!$get_captions_url) {
+                    $curl = curl_init();
+                    curl_setopt_array($curl, [
+                        CURLOPT_RETURNTRANSFER => 1,
+                        CURLOPT_URL => $get_captions_url,
+                        CURLOPT_USERAGENT => 'Gallery Dude'
+                    ]);
+                    $httpResponse = curl_exec($curl);
+                    curl_close($curl);
+                }
+
+                // Extract data from $httpResponse
+                $data = isset($httpResponse) ? json_decode($httpResponse, true) : null;
+                $caption_date = isset($data["caption_date"]) ? $data["caption_date"] . ", "  : "No Date";
+                $caption_text = isset($data["caption_text"]) ? $data["caption_text"] : "No Caption";
+
+                // Build image html with caption info
+                $captionStyleString = 'background-color: red; color: green;';
+                $captionStyleString = 'cursor: pointer;';
+                $h4Content = '<h4 id=\'caption_' . $file . '\' style=\'' . $captionStyleString . '\'> <span onClick=\'captionDateClick(event)\' >' . $caption_date . '</span> <span id=\'' . $file . '\'  onClick=\'captionTextClick(event)\' >' . $caption_text .  '</span></h4>';
                 $output .=
                     '
                         <li
                             data-src="images/' . $file . '"
-                            data-sub-html="<h4>Cool Pic</h4>"
+                            data-sub-html="' . $h4Content . '"
                             data-pinterest-text="Pin it"
                             data-tweet-text="share on twitter "
                         >
@@ -366,6 +391,51 @@
         $(document).ready(function() {
             $('#lightgallery').lightGallery();
         });
+    </script>
+
+    <script type="text/javascript">
+        async function captionTextClick(e) {
+
+            const h4Element = e.target;
+            const newCaptionText = prompt("Enter a new caption", h4Element.innerHTML);
+
+            if (!!newCaptionText && !!h4Element) {
+
+                // Update displayed html
+                h4Element.innerHTML = newCaptionText;
+
+                // Update mysql
+                // Build api url
+                const caption_id = h4Element.id;
+                const caption_api_url = location.href.split('galleries')[0] + 'galleries/captions';
+
+                // Example get request
+                // const getResp = await fetch(caption_api_url + '/' + caption_id);
+                // const data = await getResp.json();
+                // console.log(data);
+
+                // Update via caption PUT request
+                const putResp = await fetch(caption_api_url + '/' + caption_id, {
+                    method: 'PUT',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    redirect: 'follow',
+                    referrer: 'no-referrer',
+                    body: JSON.stringify({
+                        'caption_text': newCaptionText
+                    })
+                });
+                const data2 = await putResp.json();
+                console.log("data2", data2);
+
+            }
+        }
+
+        function captionDateClick(e) {}
     </script>
 </body>
 

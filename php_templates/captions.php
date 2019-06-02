@@ -3,8 +3,8 @@
 // Load in env vars and connect to DB
 // require_once __DIR__ . '/../db.php';
 
-$temp = getcwd() . '/db.php';
-require_once $temp;
+$dbConnectionFile = getcwd() . '/db.php';
+require_once $dbConnectionFile;
 
 // Handle http request
 $request_method = $_SERVER["REQUEST_METHOD"];
@@ -52,6 +52,8 @@ function get_captions($caption_id)
         );
     }
     header('Content-Type: application/json');
+    $response = count($response) === 1 ? $response[0] : $response;
+    // Why aint this updating
     echo json_encode($response);
 }
 
