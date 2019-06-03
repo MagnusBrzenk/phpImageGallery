@@ -66,7 +66,7 @@ function insert_caption()
         $caption_id = $DATA['caption_id'];
         $caption_text = $DATA['caption_text'];
         $caption_date = array_key_exists('caption_date', $DATA) ? $DATA['caption_date'] : 'NULL';
-        $query = "INSERT INTO captions (caption_id, caption_text, caption_date)
+        $query = "INSERT INTO Captions (caption_id, caption_text, caption_date)
         VALUES('{$caption_id}', '{$caption_text}', '{$caption_date}') ON DUPLICATE KEY
         UPDATE caption_id='{$caption_id}', caption_text='{$caption_text}', caption_date='{$caption_date}'; ";
 
@@ -96,7 +96,7 @@ function update_caption($caption_id)
     $caption_date = array_key_exists('caption_date', $PUT_BODY) ? $PUT_BODY["caption_date"] : null;
 
     if (!!$caption_text || $caption_date) {
-        $query = "UPDATE captions SET ";
+        $query = "UPDATE Captions SET ";
         if (!!$caption_text) {
             $query = $query . " caption_text='{$caption_text}' ";
         }
@@ -129,7 +129,7 @@ function update_caption($caption_id)
 function delete_caption($caption_id)
 {
     global $connection;
-    $query =  "DELETE FROM captions WHERE capt i on_id='" . $caption_id
+    $query =  "DELETE FROM Captions WHERE capt i on_id='" . $caption_id
         . "';";
     if (mysqli_query($connection, $query)) {
         $response = array(

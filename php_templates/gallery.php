@@ -326,7 +326,8 @@
             if (strpos($file, '.jpg') !== false && $index <= $max_items) {
 
                 // Build get-caption URL
-                $get_captions_url = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '../captions/' . $file : null;
+                $https_prefix = isset($_SERVER['HTTPS']) ? "https://" : "";
+                $get_captions_url = isset($_SERVER['HTTP_HOST']) ? $https_prefix . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '../captions/' . $file : null;
 
                 // Get caption from api using php curl protocol
                 if (!!$get_captions_url) {
@@ -415,8 +416,8 @@
                 // console.log(data);
 
                 // Update via caption PUT request
-                const putResp = await fetch(caption_api_url + '/' + caption_id, {
-                    method: 'PUT',
+                const putResp = await fetch(caption_api_url, {
+                    method: 'POST',
                     mode: 'cors',
                     cache: 'no-cache',
                     credentials: 'same-origin',
@@ -425,13 +426,13 @@
                     },
                     redirect: 'follow',
                     referrer: 'no-referrer',
-                    body: JSON.stringify({
+                    body: JSON.stringify([{
+                        'caption_id': caption_id,
                         'caption_text': newCaptionText
-                    })
+                    }])
                 });
                 const data2 = await putResp.json();
-                console.log("data2", data2);
-
+                // console.log("data2", data2);
             }
         }
 

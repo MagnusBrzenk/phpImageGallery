@@ -7,5 +7,8 @@ eval $(cat .env | sed 's/^/export /')
 rsync -avzd \
     --exclude=**/media-dump \
     --exclude=**/processed-media \
+    --exclude=**/.env \
     $PWD/galleries/ \
     $REMOTE_USER@$REMOTE_URL:$REMOTE_GALLERIES_FILE_LOCATION
+
+scp .env _test_api _aux_functions _mysql_setup $REMOTE_USER@$REMOTE_URL:$REMOTE_GALLERIES_FILE_LOCATION
