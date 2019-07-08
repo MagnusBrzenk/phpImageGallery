@@ -17,7 +17,6 @@
 cp php_templates/.htaccess ./galleries/
 cp php_templates/.htpasswd ./galleries/
 cp php_templates/captions.php ./galleries/
-# cp php_templates/index.html ./galleries/
 cp php_templates/db.php ./galleries/
 cp php_templates/galleries.php ./galleries/index.php
 cp php_templates/composer.json ./galleries/
@@ -34,6 +33,6 @@ cd ..
 # Loop through all gallery directories and add index.php (except for vendor)
 for file in galleries/*; do
     if [[ -d $file ]] && [[ ! $file == 'galleries/vendor' ]]; then
-        cp php_templates/gallery.php $file/index.php
+        cp php_templates/gallery-index.php $file/index.php
     fi
 done

@@ -3,6 +3,14 @@
 #Load .env vars
 eval $(cat .env | sed 's/^/export /')
 
+# Dump mysql
+cmd="mysqldump -u $LOCAL_DB_USERNAME --password='$LOCAL_DB_PASSWORD' --databases --skip-add-drop-table --add-drop-database $LOCAL_DB_NAME > phpgallery_dbs.sql"
+eval $cmd
+echo $cmd
+
+#
+sed -i '' 's/CREATE TABLE/CREATE TABLE IF NOT EXISTS/g' ./phpgallery_dbs.sql
+
 # Sync galleries with remote dir
 rsync -avzd \
     --exclude=**/media-dump \
@@ -11,4 +19,14 @@ rsync -avzd \
     $PWD/galleries/ \
     $REMOTE_USER@$REMOTE_URL:$REMOTE_GALLERIES_FILE_LOCATION
 
-scp .env _test_api _aux_functions _mysql_setup $REMOTE_USER@$REMOTE_URL:$REMOTE_GALLERIES_FILE_LOCATION
+scp .env phpgallery_dbs.sql _test_api _aux_functions _mysql_setup $REMOTE_USER@$REMOTE_URL:$REMOTE_GALLERIES_FILE_LOCATION
+
+# Remotely load in the rsynced-mysql dump file:
+
+remote_cmd="
+    cd $REMOTE_GALLERIES_FILE_LOCATION; 
+    mysql -u $REMOTE_DB_USERNAME --password='$REMOTE_DB_PASSWORD' < phpgallery_dbs.sql
+"
+ssh $REMOTE_USER@$REMOTE_URL $remote_cmd
+echo "--------"
+echo $remote_cmd

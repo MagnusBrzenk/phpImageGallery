@@ -294,7 +294,7 @@
                     <div class="page-head">
                         <h1>' . str_replace('_', ' ', basename(getcwd())) . '</h1>
                         <p class="lead">
-                            Pics and videos of the family
+                            Pics and Videos 
                         </p>
                     </div>
                     <div class="demo-gallery">

@@ -43,7 +43,7 @@ QUERY_CREATE_TABLES="
     CREATE TABLE IF NOT EXISTS Captions (
         caption_id varchar(12) NOT NULL UNIQUE PRIMARY KEY,
         caption_text varchar(350),
-        caption_date varchar(12)
+        caption_date varchar(20)
     ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 "
 query_mysql $QUERY_CREATE_TABLES

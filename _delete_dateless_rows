@@ -1,0 +1,31 @@
+#!/bin/bash
+
+#
+source _aux_functions
+
+#Load .env vars
+eval $(cat .env | sed 's/^/export /')
+
+QUERY="
+USE $LOCAL_DB_NAME; SELECT caption_id FROM Captions WHERE caption_date IS NULL;
+"
+mysql -B -u $LOCAL_DB_USERNAME --password="$LOCAL_DB_PASSWORD" -e "$QUERY"
+
+# while read line; do
+#     myarray+=("$line")
+# done < <(mysql -B -u $LOCAL_DB_USERNAME --password="$LOCAL_DB_PASSWORD" -e "$QUERY")
+
+# echo "++++++++++++"
+# echo $myarray
+
+OIFS="$IFS"
+IFS=$'\n'
+oset="$-"
+set -f
+
+while IFS="$OIFS" read -a line; do
+    myarray+=("$line")
+done < <(mysql -B -u $LOCAL_DB_USERNAME --password="$LOCAL_DB_PASSWORD" -e "$QUERY")
+
+echo "++++++++++++"
+echo $myarray

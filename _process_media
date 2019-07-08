@@ -65,6 +65,8 @@ for gallery in *; do
                         VALUES('$file_lowercase', '$caption_date') ON DUPLICATE KEY
                         UPDATE caption_id='$file_lowercase', caption_date='$caption_date';
                     "
+            echo ">>>>>"
+            echo $query
             query_mysql $query
 
             # Move file back to media-dump
